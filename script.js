@@ -1,14 +1,20 @@
-// Supabase Integration - Using ES6 Module approach
+// Supabase Integration - Back to CDN approach
 let supabase;
 
-// Wait for the module to load
+// Wait for Supabase to load
 function initializeSupabase() {
-    if (window.supabaseClient) {
+    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+        const supabaseUrl = 'https://oaiaawwiwawmrsukobmc.supabase.co';
+        const supabaseKey = 'sb_publishable_CxlR8ynzGWtNq11f_XwUww_j-yQ-IEV';
+        
+        if (!window.supabaseClient) {
+            window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+        }
         supabase = window.supabaseClient;
         console.log('Supabase client initialized successfully');
         return true;
     } else {
-        console.error('Supabase client not available');
+        console.error('Supabase library not loaded');
         return false;
     }
 }
@@ -760,10 +766,13 @@ function submitReport() {
     }
 }
 
-document.getElementById('reportLink').addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('To report abuse, please contact us with details of the problematic content.');
-});
+const reportLink = document.getElementById('reportLink');
+if (reportLink) {
+    reportLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('To report abuse, please contact us with details of the problematic content.');
+    });
+}
 
 // Add scroll effect to navbar
 window.addEventListener('scroll', () => {
