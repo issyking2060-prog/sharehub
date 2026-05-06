@@ -60,11 +60,26 @@ const browseBtn = document.getElementById('browseBtn');
 const uploadProgress = document.getElementById('uploadProgress');
 const progressFill = document.getElementById('progressFill');
 const progressText = document.getElementById('progressText');
+const fileDescription = document.getElementById('fileDescription');
+const charCount = document.getElementById('charCount');
 const visibilityToggle = document.getElementById('visibilityToggle');
 const visibilityStatus = document.getElementById('visibilityStatus');
 const visibilityDescription = document.getElementById('visibilityDescription');
 
 browseBtn.addEventListener('click', () => fileInput.click());
+
+// Description character counter
+fileDescription.addEventListener('input', () => {
+    const length = fileDescription.value.length;
+    charCount.textContent = length;
+    if (length > 180) {
+        charCount.style.color = '#ef4444';
+    } else if (length > 150) {
+        charCount.style.color = '#f59e0b';
+    } else {
+        charCount.style.color = '#666';
+    }
+});
 
 // Visibility toggle functionality
 visibilityToggle.addEventListener('change', () => {
@@ -142,6 +157,11 @@ async function uploadFile(file) {
                         // Refresh files display
                         loadFilesFromSupabase();
                         
+                        // Clear description field
+                        fileDescription.value = '';
+                        charCount.textContent = '0';
+                        charCount.style.color = '#666';
+                        
                         const visibility = uploadedFile.visibility === 'public' ? 'Public' : 'Private';
                         showNotification(`File "${file.name}" uploaded successfully as ${visibility}!`, 'success');
                     }, 1000);
@@ -152,6 +172,9 @@ async function uploadFile(file) {
                     progressFill.style.width = '0%';
                     progressText.textContent = '0%';
                     fileInput.value = '';
+                    fileDescription.value = '';
+                    charCount.textContent = '0';
+                    charCount.style.color = '#666';
                 }
             });
         }
@@ -215,6 +238,8 @@ async function loadFilesFromSupabase() {
 async function uploadFileToSupabase(file) {
     try {
         const visibility = visibilityToggle.checked ? 'public' : 'private';
+        const description = fileDescription.value.trim() || 
+            `Uploaded ${new Date().toLocaleDateString()} - ${visibility === 'public' ? 'Public' : 'Private'} file`;
         
         const { data, error } = await supabase
             .from('files')
@@ -227,7 +252,7 @@ async function uploadFileToSupabase(file) {
                     visibility: visibility,
                     upload_date: new Date().toISOString(),
                     downloads: 0,
-                    description: `Uploaded ${new Date().toLocaleDateString()} - ${visibility === 'public' ? 'Public' : 'Private'} file`
+                    description: description
                 }
             ])
             .select();

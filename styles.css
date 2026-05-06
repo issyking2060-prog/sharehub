@@ -580,13 +580,59 @@ body {
     background: #ef4444;
 }
 
-/* Visibility Toggle */
-.visibility-toggle {
+/* File Details */
+.file-details {
     margin-top: 2rem;
     padding: 1.5rem;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     backdrop-filter: blur(10px);
+}
+
+.description-field {
+    margin-bottom: 1.5rem;
+}
+
+.description-field label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.description-field textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.description-field textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.char-count {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+/* Visibility Toggle */
+.visibility-toggle {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .toggle-label {
