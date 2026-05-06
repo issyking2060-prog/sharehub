@@ -119,8 +119,8 @@ fileInput.addEventListener('change', (e) => {
 
 function handleFiles(files) {
     Array.from(files).forEach(file => {
-        if (file.size > 50 * 1024 * 1024) {
-            alert(`File "${file.name}" is too large. Maximum size is 50MB.`);
+        if (file.size > 100 * 1024 * 1024) {
+            alert(`File "${file.name}" is too large. Maximum size is 100MB.`);
             return;
         }
         uploadFile(file);
@@ -452,16 +452,200 @@ document.getElementById('categoryFilter').addEventListener('change', displayFile
 document.getElementById('visibilityFilter').addEventListener('change', displayFiles);
 document.getElementById('sortBy').addEventListener('change', displayFiles);
 
+// Legal modal functionality
+const legalModal = document.getElementById('legalModal');
+const legalModalTitle = document.getElementById('legalModalTitle');
+const legalModalBody = document.getElementById('legalModalBody');
+const closeLegalModal = document.getElementById('closeLegalModal');
+
+closeLegalModal.addEventListener('click', () => {
+    legalModal.style.display = 'none';
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === legalModal) {
+        legalModal.style.display = 'none';
+    }
+});
+
+// Legal pages content
+const legalContent = {
+    privacy: {
+        title: 'Privacy Policy',
+        content: `
+            <div class="legal-content">
+                <h2>Privacy Policy for ShareHub</h2>
+                <p><strong>Last updated:</strong> ${new Date().toLocaleDateString()}</p>
+                
+                <h3>1. Information We Collect</h3>
+                <p>We collect minimal information necessary to provide our file sharing service:</p>
+                <ul>
+                    <li>File metadata (name, size, type, upload date)</li>
+                    <li>File descriptions and visibility settings</li>
+                    <li>Download statistics (count only)</li>
+                    <li>No personal identification required</li>
+                </ul>
+                
+                <h3>2. How We Use Your Information</h3>
+                <ul>
+                    <li>To provide file sharing services</li>
+                    <li>To display file information to other users</li>
+                    <li>To generate download statistics</li>
+                    <li>To improve our services</li>
+                </ul>
+                
+                <h3>3. Data Security</h3>
+                <p>We implement appropriate security measures to protect your files and information.</p>
+                
+                <h3>4. Cookies</h3>
+                <p>We use minimal cookies for essential functionality only.</p>
+                
+                <h3>5. Third-Party Services</h3>
+                <p>We use Supabase for database services and Vercel for hosting.</p>
+                
+                <h3>6. Your Rights</h3>
+                <ul>
+                    <li>You can delete your uploaded files at any time</li>
+                    <li>You can modify file descriptions and visibility</li>
+                    <li>You can request data removal</li>
+                </ul>
+                
+                <h3>7. Contact Us</h3>
+                <div class="contact-info">
+                    <p>If you have questions about this Privacy Policy, please contact us.</p>
+                </div>
+            </div>
+        `
+    },
+    terms: {
+        title: 'Terms of Service',
+        content: `
+            <div class="legal-content">
+                <h2>Terms of Service for ShareHub</h2>
+                <p><strong>Last updated:</strong> ${new Date().toLocaleDateString()}</p>
+                
+                <h3>1. Acceptance of Terms</h3>
+                <p>By using ShareHub, you agree to these Terms of Service.</p>
+                
+                <h3>2. Service Description</h3>
+                <p>ShareHub is a free file sharing platform that allows users to upload, share, and download files.</p>
+                
+                <h3>3. Acceptable Use</h3>
+                <p>You agree to use our service responsibly:</p>
+                <ul>
+                    <li>No illegal or harmful content</li>
+                    <li>No copyrighted material without permission</li>
+                    <li>No malware or viruses</li>
+                    <li>No spam or abusive behavior</li>
+                    <li>Respect other users' privacy</li>
+                </ul>
+                
+                <h3>4. File Content</h3>
+                <ul>
+                    <li>You are responsible for files you upload</li>
+                    <li>You must have rights to share uploaded content</li>
+                    <li>We reserve the right to remove inappropriate content</li>
+                </ul>
+                
+                <h3>5. Privacy</h3>
+                <p>Your privacy is important to us. Please review our Privacy Policy.</p>
+                
+                <h3>6. Service Availability</h3>
+                <p>We strive to maintain high availability but cannot guarantee 100% uptime.</p>
+                
+                <h3>7. Limitations</h3>
+                <ul>
+                    <li>Maximum file size: 100MB</li>
+                    <li>Files may be removed after extended inactivity</li>
+                    <li>We reserve the right to modify service features</li>
+                </ul>
+                
+                <h3>8. Disclaimer</h3>
+                <p>ShareHub is provided "as is" without warranties of any kind.</p>
+                
+                <h3>9. Contact</h3>
+                <div class="contact-info">
+                    <p>For questions about these Terms of Service, please contact us.</p>
+                </div>
+            </div>
+        `
+    },
+    report: {
+        title: 'Report Abuse',
+        content: `
+            <div class="legal-content">
+                <h2>Report Abuse</h2>
+                <p>If you encounter inappropriate content or behavior on ShareHub, please report it to us.</p>
+                
+                <h3>What to Report</h3>
+                <ul>
+                    <li>Illegal content or activities</li>
+                    <li>Copyright infringement</li>
+                    <li>Malware or viruses</li>
+                    <li>Harassment or abuse</li>
+                    <li>Spam or fraudulent content</li>
+                    <li>Privacy violations</li>
+                </ul>
+                
+                <h3>How to Report</h3>
+                <div class="report-form">
+                    <textarea id="reportContent" placeholder="Please describe the issue in detail. Include file name, URL, and any relevant information..."></textarea>
+                    <button onclick="submitReport()">Submit Report</button>
+                </div>
+                
+                <h3>What Happens Next</h3>
+                <ul>
+                    <li>We review all reports within 24-48 hours</li>
+                    <li>We take appropriate action based on our findings</li>
+                    <li>We may remove content and suspend accounts</li>
+                    <li>We follow up with serious legal matters</li>
+                </ul>
+                
+                <h3>Emergency Reports</h3>
+                <p>For immediate threats or illegal content involving minors, please contact local authorities immediately.</p>
+                
+                <h3>Contact Information</h3>
+                <div class="contact-info">
+                    <p>For urgent matters, please reach out through our contact channels.</p>
+                </div>
+            </div>
+        `
+    }
+};
+
 // Footer links
 document.getElementById('privacyLink').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Privacy Policy: We respect your privacy and only collect necessary information for file sharing.');
+    legalModalTitle.textContent = legalContent.privacy.title;
+    legalModalBody.innerHTML = legalContent.privacy.content;
+    legalModal.style.display = 'block';
 });
 
 document.getElementById('termsLink').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Terms of Service: Use this platform responsibly. Do not upload illegal or harmful content.');
+    legalModalTitle.textContent = legalContent.terms.title;
+    legalModalBody.innerHTML = legalContent.terms.content;
+    legalModal.style.display = 'block';
 });
+
+document.getElementById('reportAbuseLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    legalModalTitle.textContent = legalContent.report.title;
+    legalModalBody.innerHTML = legalContent.report.content;
+    legalModal.style.display = 'block';
+});
+
+// Submit report function
+function submitReport() {
+    const reportContent = document.getElementById('reportContent');
+    if (reportContent && reportContent.value.trim()) {
+        showNotification('Report submitted successfully. We will review it within 24-48 hours.', 'success');
+        legalModal.style.display = 'none';
+        reportContent.value = '';
+    } else {
+        showNotification('Please provide details about the issue you want to report.', 'error');
+    }
+}
 
 document.getElementById('reportLink').addEventListener('click', (e) => {
     e.preventDefault();

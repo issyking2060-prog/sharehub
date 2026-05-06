@@ -55,7 +55,7 @@
                             <i class="fas fa-cloud-upload-alt"></i>
                         </div>
                         <h3>Drag & Drop Files Here</h3>
-                        <p>or click to browse (Max 50MB)</p>
+                        <p>or click to browse (Max 100MB)</p>
                         <button class="btn-primary" id="browseBtn">Choose Files</button>
                         <input type="file" id="fileInput" multiple accept="image/*,application/pdf,.doc,.docx,.txt,.zip,.rar,.7z,video/*,audio/*">
                         
@@ -247,7 +247,8 @@
             <div class="footer-links">
                 <a href="#" id="privacyLink">Privacy Policy</a>
                 <a href="#" id="termsLink">Terms of Service</a>
-                <a href="#" id="reportLink">Report Abuse</a>
+                <a href="#" id="reportAbuseLink">Report Abuse</a>
+                <a href="#contact">Contact</a>
             </div>
         </div>
     </footer>
@@ -260,13 +261,28 @@
                 <h3 id="modalTitle">File Preview</h3>
             </div>
             <div class="modal-body" id="modalBody">
-                <!-- Preview content will be loaded here -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" id="downloadBtn">Download</button>
-                <button class="btn btn-secondary" id="shareBtn">Copy Link</button>
+                <!-- File preview content -->
             </div>
         </div>
+    </div>
+
+    <!-- Legal Pages Modal -->
+    <div class="modal" id="legalModal">
+        <div class="modal-content legal-modal">
+            <span class="close" id="closeLegalModal">&times;</span>
+            <div class="modal-header">
+                <h3 id="legalModalTitle">Legal Information</h3>
+            </div>
+            <div class="modal-body" id="legalModalBody">
+                <!-- Legal content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- File Preview Modal Footer -->
+    <div class="modal-footer">
+        <button class="btn btn-primary" id="downloadBtn">Download</button>
+        <button class="btn btn-secondary" id="shareBtn">Copy Link</button>
     </div>
 
     <script src="script.js"></script>
