@@ -16,10 +16,10 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"></script>
+    <!-- Firebase SDK - Compatible version -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script>
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -33,16 +33,16 @@
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const db = getFirestore(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const analytics = firebase.analytics();
 
         // Make Firebase available globally
-        window.firebaseApp = app;
+        window.firebaseApp = firebase.app();
         window.firebaseDB = db;
         window.firebaseAnalytics = analytics;
         
-        console.log('Firebase initialized successfully');
+        console.log('Firebase initialized successfully with compat version');
     </script>
 </head>
 <body>

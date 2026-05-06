@@ -14,8 +14,10 @@ async function loadFilesFromStorage() {
     
     try {
         console.log('Loading files from Firebase...');
-        const q = query(collection(window.firebaseDB, 'files'), orderBy('upload_date', 'desc'));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await window.firebaseDB
+            .collection('files')
+            .orderBy('upload_date', 'desc')
+            .get();
         console.log('Firebase query snapshot:', querySnapshot);
         
         uploadedFiles = [];
@@ -262,7 +264,7 @@ async function uploadFile(file) {
                     };
                     
                     // Save to Firebase
-                    const docRef = await addDoc(collection(window.firebaseDB, 'files'), newFile);
+                    const docRef = await window.firebaseDB.collection('files').add(newFile);
                     newFile.id = docRef.id;
                     
                     uploadedFiles.unshift(newFile);
@@ -399,7 +401,7 @@ async function downloadFile(fileId) {
         // Increment download count and update in Firebase
         file.downloads++;
         try {
-            await updateDoc(doc(window.firebaseDB, 'files', file.id), {
+            await window.firebaseDB.collection('files').doc(file.id).update({
                 downloads: file.downloads
             });
         } catch (error) {
