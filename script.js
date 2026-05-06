@@ -1,33 +1,9 @@
-// File storage (in real app, this would be server-side)
-let uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || [];
+// File storage (ready for Supabase integration)
+let uploadedFiles = [];
 let currentFileId = null;
 
-// Initialize with some demo files if localStorage is empty
-if (uploadedFiles.length === 0) {
-    uploadedFiles = [
-        {
-            id: Date.now() + 1,
-            name: "Sample Document.pdf",
-            size: 1024 * 1024,
-            type: "application/pdf",
-            category: "document",
-            uploadDate: new Date().toISOString(),
-            downloads: 5,
-            description: "Sample PDF document for demonstration"
-        },
-        {
-            id: Date.now() + 2,
-            name: "Sample Image.jpg",
-            size: 512 * 1024,
-            type: "image/jpeg",
-            category: "image",
-            uploadDate: new Date().toISOString(),
-            downloads: 3,
-            description: "Sample image file for demonstration"
-        }
-    ];
-    localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
-}
+// Clear localStorage for fresh Supabase integration
+localStorage.removeItem('uploadedFiles');
 
 // Mobile menu toggle
 const mobileMenu = document.getElementById('mobile-menu');
