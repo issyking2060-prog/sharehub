@@ -6,9 +6,27 @@ let currentFileId = null;
 const mobileMenu = document.getElementById('mobile-menu');
 const navMenu = document.querySelector('.nav-menu');
 
-mobileMenu.addEventListener('click', () => {
+// Touch-friendly menu toggle
+mobileMenu.addEventListener('click', (e) => {
+    e.preventDefault();
     mobileMenu.classList.toggle('active');
     navMenu.classList.toggle('active');
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', (e) => {
+    if (!mobileMenu.contains(e.target) && !navMenu.contains(e.target)) {
+        mobileMenu.classList.remove('active');
+        navMenu.classList.remove('active');
+    }
+});
+
+// Close menu on escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        mobileMenu.classList.remove('active');
+        navMenu.classList.remove('active');
+    }
 });
 
 // Smooth scrolling for navigation links
