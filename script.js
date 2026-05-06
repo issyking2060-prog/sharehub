@@ -1,7 +1,7 @@
 // Supabase Integration
 const supabaseUrl = 'https://oaiaawwiwawmrsukobmc.supabase.co';
 const supabaseKey = 'sb_publishable_CxlR8ynzGWtNq11f_XwUww_j-yQ-IEV';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // File storage (now using Supabase)
 let uploadedFiles = [];
