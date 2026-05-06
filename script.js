@@ -240,9 +240,16 @@ function downloadFile(fileId) {
         file.downloads++;
         localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
         
+        // Create sample file content for demo
+        const sampleContent = generateSampleFileContent(file);
+        
+        // Create blob and download URL
+        const blob = new Blob([sampleContent], { type: file.type || 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        
         // Create download link
         const downloadLink = document.createElement('a');
-        downloadLink.href = '#';
+        downloadLink.href = url;
         downloadLink.download = file.name;
         downloadLink.style.display = 'none';
         document.body.appendChild(downloadLink);
@@ -250,10 +257,13 @@ function downloadFile(fileId) {
         // Show download notification
         showNotification(`Downloading "${file.name}" (${formatFileSize(file.size)})`, 'success');
         
-        // Simulate download progress
+        // Trigger download
+        downloadLink.click();
+        
+        // Show completion notification
         setTimeout(() => {
-            showNotification(`Download completed! File has been saved.`, 'success');
-        }, 1500);
+            showNotification(`Download completed! "${file.name}" has been saved.`, 'success');
+        }, 1000);
         
         // Update display
         displayFiles();
@@ -262,7 +272,35 @@ function downloadFile(fileId) {
         // Clean up
         setTimeout(() => {
             document.body.removeChild(downloadLink);
-        }, 100);
+            URL.revokeObjectURL(url);
+        }, 2000);
+    }
+}
+
+// Generate sample file content based on file type
+function generateSampleFileContent(file) {
+    const timestamp = new Date().toISOString();
+    const header = `ShareHub Download - ${timestamp}\n`;
+    const footer = `\n\n---\nDownloaded from ShareHub by ${file.name}\nSize: ${formatFileSize(file.size)}\nDownloads: ${file.downloads + 1}\nCreated: ${file.uploadDate}\n---`;
+    
+    switch (file.category) {
+        case 'document':
+            return header + `Document Information:\n\nThis is a sample document file uploaded to ShareHub.\n\nFile Details:\n- Name: ${file.name}\n- Size: ${formatFileSize(file.size)}\n- Category: ${file.category}\n- Upload Date: ${file.uploadDate}\n\nThis is a demonstration file showing how ShareHub works.\nIn a production environment, this would be the actual uploaded document content.` + footer;
+            
+        case 'image':
+            return header + `Image File Information:\n\nThis is a sample image file from ShareHub.\n\nFile Details:\n- Name: ${file.name}\n- Size: ${formatFileSize(file.size)}\n- Category: ${file.category}\n- Upload Date: ${file.uploadDate}\n\nNote: This is a placeholder for the actual image file.\nIn production, users would download the real image data.` + footer;
+            
+        case 'video':
+            return header + `Video File Information:\n\nThis is a sample video file from ShareHub.\n\nFile Details:\n- Name: ${file.name}\n- Size: ${formatFileSize(file.size)}\n- Category: ${file.category}\n- Upload Date: ${file.uploadDate}\n\nNote: This is a placeholder for the actual video file.\nIn production, users would download the real video data.` + footer;
+            
+        case 'audio':
+            return header + `Audio File Information:\n\nThis is a sample audio file from ShareHub.\n\nFile Details:\n- Name: ${file.name}\n- Size: ${formatFileSize(file.size)}\n- Category: ${file.category}\n- Upload Date: ${file.uploadDate}\n\nNote: This is a placeholder for the actual audio file.\nIn production, Users would download the real audio data.` + footer;
+            
+        case 'archive':
+            return header + `Archive File Information:\n\nThis is a sample archive file from ShareHub.\n\nFile Details:\n- Name: ${file.name}\n- Size: ${formatFileSize(file.size)}\n- Category: ${file.category}\n- Upload Date: ${file.uploadDate}\n\nNote: This is a placeholder for the actual archive file.\nIn production, Users would download the real archive data.` + footer;
+            
+        default:
+            return header + `File Information:\n\nThis is a sample file from ShareHub.\n\nFile Details:\n- Name: ${file.name}\n- Size: ${formatFileSize(file.size)}\n- Category: ${file.category}\n- Upload Date: ${file.uploadDate}\n\nNote: This is a placeholder for the actual file content.\nIn production, Users would download the real file data.` + footer;
     }
 }
 
