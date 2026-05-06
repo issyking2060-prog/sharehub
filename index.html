@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareHub - Global File Sharing Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-share-alt"></i> ShareHub
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#upload" class="nav-link">Upload</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#files" class="nav-link">Browse Files</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">About</a>
+                </li>
+            </ul>
+            <div class="nav-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="upload" class="hero">
+            <div class="hero-container">
+                <h1 class="hero-title">Share Files Globally</h1>
+                <p class="hero-subtitle">Upload and share resources with the world. Simple, fast, and secure.</p>
+                
+                <div class="upload-section">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Drop files here or click to browse</h3>
+                        <p>Maximum file size: 50MB | Supported: Images, Documents, Videos, Audio</p>
+                        <input type="file" id="fileInput" multiple accept="image/*,application/pdf,.doc,.docx,.txt,.mp4,.mp3,.zip,.rar">
+                        <button class="btn btn-primary" id="browseBtn">Choose Files</button>
+                    </div>
+                    
+                    <div class="upload-progress" id="uploadProgress" style="display: none;">
+                        <h3>Uploading...</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span id="progressText">0%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="files" class="files-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Shared Files</h2>
+                    <div class="filter-controls">
+                        <input type="text" id="searchInput" placeholder="Search files...">
+                        <select id="categoryFilter">
+                            <option value="">All Categories</option>
+                            <option value="image">Images</option>
+                            <option value="document">Documents</option>
+                            <option value="video">Videos</option>
+                            <option value="audio">Audio</option>
+                            <option value="archive">Archives</option>
+                        </select>
+                        <select id="sortBy">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="name">Name A-Z</option>
+                            <option value="size">Size</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="files-grid" id="filesGrid">
+                    <!-- Files will be dynamically added here -->
+                </div>
+
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-folder-open"></i>
+                    <h3>No files shared yet</h3>
+                    <p>Be the first to share a file with the community!</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <h2>About ShareHub</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <h3>Global Resource Sharing</h3>
+                        <p>ShareHub is a community-driven platform where users can upload and download various types of files. From documents and images to software and media, share your resources with a global audience.</p>
+                        
+                        <h3>🌍 High-Impact Content Categories</h3>
+                        <p>We focus on content that makes a real difference in people's lives. Here's what you can share and discover:</p>
+                        
+                        <div class="categories-grid">
+                            <div class="category-card">
+                                <div class="category-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <h4>Educational Resources</h4>
+                                <p>Free textbooks, study guides, language learning materials, coding tutorials, and science diagrams that help students and learners worldwide.</p>
+                            </div>
+                            
+                            <div class="category-card">
+                                <div class="category-icon">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <h4>Digital Tools & Utilities</h4>
+                                <p>Open-source software, productivity templates, design assets, and configuration files that make digital life easier for everyone.</p>
+                            </div>
+                            
+                            <div class="category-card">
+                                <div class="category-icon">
+                                    <i class="fas fa-first-aid"></i>
+                                </div>
+                                <h4>Emergency & Preparedness</h4>
+                                <p>First aid guides, emergency contact templates, disaster preparation checklists, and offline medical references that could save lives.</p>
+                            </div>
+                            
+                            <div class="category-card">
+                                <div class="category-icon">
+                                    <i class="fas fa-palette"></i>
+                                </div>
+                                <h4>Creative & Cultural</h4>
+                                <p>Public domain books, traditional music, global recipes, and art reference photos that celebrate and preserve world culture.</p>
+                            </div>
+                        </div>
+                        
+                        <h3>🎯 Getting Started</h3>
+                        <div class="getting-started">
+                            <div class="step">
+                                <span class="step-number">1</span>
+                                <div class="step-content">
+                                    <h4>Explore Categories</h4>
+                                    <p>Browse through our curated categories to find resources that interest you or could help others.</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <span class="step-number">2</span>
+                                <div class="step-content">
+                                    <h4>Upload Valuable Content</h4>
+                                    <p>Share files that provide real value - educational materials, useful tools, or emergency resources.</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <span class="step-number">3</span>
+                                <div class="step-content">
+                                    <h4>Share with the World</h4>
+                                    <p>Use our share links to distribute resources globally and help people access important information.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h3>✨ Platform Features</h3>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Free file hosting up to 50MB</li>
+                            <li><i class="fas fa-check"></i> Multiple file format support</li>
+                            <li><i class="fas fa-check"></i> Fast download speeds</li>
+                            <li><i class="fas fa-check"></i> No registration required</li>
+                            <li><i class="fas fa-check"></i> Direct download links</li>
+                            <li><i class="fas fa-check"></i> Content categorization and search</li>
+                            <li><i class="fas fa-check"></i> Download tracking and statistics</li>
+                        </ul>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalFiles">0</span>
+                            <span class="stat-label">Files Shared</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalDownloads">0</span>
+                            <span class="stat-label">Downloads</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalSize">0 MB</span>
+                            <span class="stat-label">Total Size</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 ShareHub. Created by Issy. Share responsibly. All files are user-uploaded content.</p>
+            <div class="footer-links">
+                <a href="#" id="privacyLink">Privacy Policy</a>
+                <a href="#" id="termsLink">Terms of Service</a>
+                <a href="#" id="reportLink">Report Abuse</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- File Preview Modal -->
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <div class="modal-header">
+                <h3 id="modalTitle">File Preview</h3>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Preview content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="downloadBtn">Download</button>
+                <button class="btn btn-secondary" id="shareBtn">Copy Link</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
