@@ -356,7 +356,7 @@ function downloadFile(fileId) {
     if (file) {
         // Increment download count
         file.downloads++;
-        localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+        saveFilesToStorage();
         
         // Create sample file content for demo
         const sampleContent = generateSampleFileContent(file);
