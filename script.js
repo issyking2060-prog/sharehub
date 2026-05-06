@@ -458,12 +458,22 @@ const legalModalTitle = document.getElementById('legalModalTitle');
 const legalModalBody = document.getElementById('legalModalBody');
 const closeLegalModal = document.getElementById('closeLegalModal');
 
-closeLegalModal.addEventListener('click', () => {
-    legalModal.style.display = 'none';
-});
+// Initialize legal modal event listeners
+if (closeLegalModal) {
+    closeLegalModal.addEventListener('click', () => {
+        legalModal.style.display = 'none';
+    });
+}
 
 window.addEventListener('click', (e) => {
     if (e.target === legalModal) {
+        legalModal.style.display = 'none';
+    }
+});
+
+// Escape key to close modal
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && legalModal.style.display === 'block') {
         legalModal.style.display = 'none';
     }
 });
@@ -613,27 +623,52 @@ const legalContent = {
     }
 };
 
-// Footer links
-document.getElementById('privacyLink').addEventListener('click', (e) => {
-    e.preventDefault();
-    legalModalTitle.textContent = legalContent.privacy.title;
-    legalModalBody.innerHTML = legalContent.privacy.content;
-    legalModal.style.display = 'block';
-});
+// Footer links - Initialize after DOM is loaded
+function initializeLegalLinks() {
+    const privacyLink = document.getElementById('privacyLink');
+    const termsLink = document.getElementById('termsLink');
+    const reportAbuseLink = document.getElementById('reportAbuseLink');
 
-document.getElementById('termsLink').addEventListener('click', (e) => {
-    e.preventDefault();
-    legalModalTitle.textContent = legalContent.terms.title;
-    legalModalBody.innerHTML = legalContent.terms.content;
-    legalModal.style.display = 'block';
-});
+    if (privacyLink) {
+        privacyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (legalModal && legalModalTitle && legalModalBody) {
+                legalModalTitle.textContent = legalContent.privacy.title;
+                legalModalBody.innerHTML = legalContent.privacy.content;
+                legalModal.style.display = 'block';
+            }
+        });
+    }
 
-document.getElementById('reportAbuseLink').addEventListener('click', (e) => {
-    e.preventDefault();
-    legalModalTitle.textContent = legalContent.report.title;
-    legalModalBody.innerHTML = legalContent.report.content;
-    legalModal.style.display = 'block';
-});
+    if (termsLink) {
+        termsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (legalModal && legalModalTitle && legalModalBody) {
+                legalModalTitle.textContent = legalContent.terms.title;
+                legalModalBody.innerHTML = legalContent.terms.content;
+                legalModal.style.display = 'block';
+            }
+        });
+    }
+
+    if (reportAbuseLink) {
+        reportAbuseLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (legalModal && legalModalTitle && legalModalBody) {
+                legalModalTitle.textContent = legalContent.report.title;
+                legalModalBody.innerHTML = legalContent.report.content;
+                legalModal.style.display = 'block';
+            }
+        });
+    }
+}
+
+// Initialize legal links when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeLegalLinks);
+} else {
+    initializeLegalLinks();
+}
 
 // Submit report function
 function submitReport() {
