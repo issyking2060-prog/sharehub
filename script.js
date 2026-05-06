@@ -2,6 +2,33 @@
 let uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || [];
 let currentFileId = null;
 
+// Initialize with some demo files if localStorage is empty
+if (uploadedFiles.length === 0) {
+    uploadedFiles = [
+        {
+            id: Date.now() + 1,
+            name: "Sample Document.pdf",
+            size: 1024 * 1024,
+            type: "application/pdf",
+            category: "document",
+            uploadDate: new Date().toISOString(),
+            downloads: 5,
+            description: "Sample PDF document for demonstration"
+        },
+        {
+            id: Date.now() + 2,
+            name: "Sample Image.jpg",
+            size: 512 * 1024,
+            type: "image/jpeg",
+            category: "image",
+            uploadDate: new Date().toISOString(),
+            downloads: 3,
+            description: "Sample image file for demonstration"
+        }
+    ];
+    localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+}
+
 // Mobile menu toggle
 const mobileMenu = document.getElementById('mobile-menu');
 const navMenu = document.querySelector('.nav-menu');
@@ -209,9 +236,6 @@ function displayFiles() {
     filesGrid.innerHTML = filteredFiles.map(file => `
         <div class="file-card" data-id="${file.id}">
             <div class="file-header">
-                <div class="file-icon">
-                    <i class="fas ${getFileIcon(file.category)}"></i>
-                </div>
                 <div class="file-info">
                     <h3 title="${file.name}">${file.name}</h3>
                     <div class="file-meta">
