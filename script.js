@@ -1,19 +1,43 @@
-// File Storage - Using localStorage (ready for Firebase integration)
+// File Storage - Using Firebase Firestore
 let uploadedFiles = [];
 let currentFileId = null;
 
-// Load files from localStorage
-function loadFilesFromStorage() {
-    const stored = localStorage.getItem('uploadedFiles');
-    if (stored) {
-        uploadedFiles = JSON.parse(stored);
+// Load files from Firebase Firestore
+async function loadFilesFromStorage() {
+    if (!window.firebaseDB) {
+        console.error('Firebase not initialized');
+        return;
     }
-    displayFiles();
+    
+    try {
+        const q = query(collection(window.firebaseDB, 'files'), orderBy('upload_date', 'desc'));
+        const querySnapshot = await getDocs(q);
+        uploadedFiles = [];
+        querySnapshot.forEach((doc) => {
+            uploadedFiles.push({ id: doc.id, ...doc.data() });
+        });
+        displayFiles();
+    } catch (error) {
+        console.error('Error loading files from Firebase:', error);
+        showNotification('Error loading files. Please try again.', 'error');
+    }
 }
 
-// Save files to localStorage
-function saveFilesToStorage() {
-    localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+// Save files to Firebase Firestore
+async function saveFilesToStorage() {
+    if (!window.firebaseDB) {
+        console.error('Firebase not initialized');
+        return;
+    }
+    
+    try {
+        // This would typically be handled by individual file operations
+        // For now, we'll just update the display
+        displayFiles();
+    } catch (error) {
+        console.error('Error saving files to Firebase:', error);
+        showNotification('Error saving files. Please try again.', 'error');
+    }
 }
 
 // Mobile menu toggle
@@ -210,42 +234,51 @@ async function uploadFile(file) {
         if (progress >= 100) {
             clearInterval(interval);
             
-            // Simulate file upload and save to localStorage
-            setTimeout(() => {
-                const visibility = visibilityToggle.checked ? 'public' : 'private';
-                const description = fileDescription.value.trim() || 
-                    `Uploaded ${new Date().toLocaleDateString()} - ${visibility === 'public' ? 'Public' : 'Private'} file`;
-                
-                const newFile = {
-                    id: Date.now().toString(),
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    category: getFileCategory(file.type),
-                    visibility: visibility,
-                    description: description,
-                    upload_date: new Date().toISOString(),
-                    downloads: 0
-                };
-                
-                uploadedFiles.unshift(newFile);
-                saveFilesToStorage();
-                displayFiles();
-                
-                // Reset UI
-                setTimeout(() => {
+            // Upload file to Firebase Firestore
+            setTimeout(async () => {
+                try {
+                    const visibility = visibilityToggle.checked ? 'public' : 'private';
+                    const description = fileDescription.value.trim() || 
+                        `Uploaded ${new Date().toLocaleDateString()} - ${visibility === 'public' ? 'Public' : 'Private'} file`;
+                    
+                    const newFile = {
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        category: getFileCategory(file.type, file.name),
+                        visibility: visibility,
+                        description: description,
+                        upload_date: new Date().toISOString(),
+                        downloads: 0
+                    };
+                    
+                    // Save to Firebase
+                    const docRef = await addDoc(collection(window.firebaseDB, 'files'), newFile);
+                    newFile.id = docRef.id;
+                    
+                    uploadedFiles.unshift(newFile);
+                    displayFiles();
+                    
+                    // Reset UI
+                    setTimeout(() => {
+                        uploadProgress.style.display = 'none';
+                        uploadArea.style.display = 'block';
+                        progressFill.style.width = '0%';
+                        progressText.textContent = '0%';
+                        fileInput.value = '';
+                        
+                        // Clear description field
+                        fileDescription.value = '';
+                        charCount.textContent = '0';
+                        
+                        showNotification('File uploaded successfully to Firebase!', 'success');
+                    }, 1000);
+                } catch (error) {
+                    console.error('Error uploading to Firebase:', error);
                     uploadProgress.style.display = 'none';
                     uploadArea.style.display = 'block';
-                    progressFill.style.width = '0%';
-                    progressText.textContent = '0%';
-                    fileInput.value = '';
-                    
-                    // Clear description field
-                    fileDescription.value = '';
-                    charCount.textContent = '0';
-                    
-                    showNotification('File uploaded successfully!', 'success');
-                }, 1000);
+                    showNotification('Upload failed. Please try again.', 'error');
+                }
             }, 2000);
         }
     }, 200);
@@ -351,12 +384,18 @@ function displayFiles() {
 }
 
 // Download file
-function downloadFile(fileId) {
+async function downloadFile(fileId) {
     const file = uploadedFiles.find(f => f.id === fileId);
     if (file) {
-        // Increment download count
+        // Increment download count and update in Firebase
         file.downloads++;
-        saveFilesToStorage();
+        try {
+            await updateDoc(doc(window.firebaseDB, 'files', file.id), {
+                downloads: file.downloads
+            });
+        } catch (error) {
+            console.error('Error updating download count:', error);
+        }
         
         // Create sample file content for demo
         const sampleContent = generateSampleFileContent(file);
@@ -798,9 +837,9 @@ setInterval(() => {
     checkForNewFiles();
 }, 30000);
 
-// Initialize with localStorage
-document.addEventListener('DOMContentLoaded', () => {
-    loadFilesFromStorage();
+// Initialize with Firebase
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadFilesFromStorage();
     
     // Show welcome notification
     setTimeout(() => {
