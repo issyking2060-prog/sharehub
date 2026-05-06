@@ -66,7 +66,44 @@ const visibilityToggle = document.getElementById('visibilityToggle');
 const visibilityStatus = document.getElementById('visibilityStatus');
 const visibilityDescription = document.getElementById('visibilityDescription');
 
-browseBtn.addEventListener('click', () => fileInput.click());
+// Debug: Check if elements exist
+console.log('Upload elements:', {
+    uploadArea: !!uploadArea,
+    fileInput: !!fileInput,
+    browseBtn: !!browseBtn,
+    uploadProgress: !!uploadProgress
+});
+
+if (browseBtn) {
+    browseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Browse button clicked');
+        if (fileInput) {
+            fileInput.click();
+        } else {
+            console.error('File input not found');
+        }
+    });
+} else {
+    console.error('Browse button not found');
+}
+
+if (uploadArea) {
+    uploadArea.addEventListener('click', (e) => {
+        // Don't trigger if clicking on form elements
+        if (e.target.closest('.file-details')) {
+            return;
+        }
+        console.log('Upload area clicked');
+        if (fileInput) {
+            fileInput.click();
+        } else {
+            console.error('File input not found');
+        }
+    });
+} else {
+    console.error('Upload area not found');
+}
 
 // Description character counter
 fileDescription.addEventListener('input', () => {
@@ -95,41 +132,65 @@ visibilityToggle.addEventListener('change', () => {
     }
 });
 
-uploadArea.addEventListener('click', () => fileInput.click());
-
 // Drag and drop
-uploadArea.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadArea.classList.add('dragover');
-});
+if (uploadArea) {
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        console.log('Drag over event');
+        uploadArea.classList.add('dragover');
+    });
 
-uploadArea.addEventListener('dragleave', () => {
-    uploadArea.classList.remove('dragover');
-});
+    uploadArea.addEventListener('dragleave', () => {
+        console.log('Drag leave event');
+        uploadArea.classList.remove('dragover');
+    });
 
-uploadArea.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadArea.classList.remove('dragover');
-    handleFiles(e.dataTransfer.files);
-});
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        console.log('Drop event', e.dataTransfer.files);
+        uploadArea.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+    });
+}
 
-fileInput.addEventListener('change', (e) => {
-    handleFiles(e.target.files);
-});
+if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+        console.log('File input change event', e.target.files);
+        handleFiles(e.target.files);
+    });
+} else {
+    console.error('File input element not found for change event');
+}
 
 function handleFiles(files) {
+    console.log('handleFiles called with:', files);
+    if (!files || files.length === 0) {
+        console.log('No files to handle');
+        return;
+    }
+    
     Array.from(files).forEach(file => {
+        console.log('Processing file:', file.name, file.size);
         if (file.size > 100 * 1024 * 1024) {
             alert(`File "${file.name}" is too large. Maximum size is 100MB.`);
             return;
         }
+        console.log('Starting upload for:', file.name);
         uploadFile(file);
     });
 }
 
 async function uploadFile(file) {
+    console.log('uploadFile called for:', file.name);
+    
+    if (!uploadArea || !uploadProgress) {
+        console.error('Upload elements not found');
+        return;
+    }
+    
     uploadArea.style.display = 'none';
     uploadProgress.style.display = 'block';
+    console.log('Upload progress shown');
 
     // Simulate upload progress
     let progress = 0;
