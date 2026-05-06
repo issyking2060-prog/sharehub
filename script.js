@@ -1,7 +1,16 @@
-// Supabase Integration
-const supabaseUrl = 'https://oaiaawwiwawmrsukobmc.supabase.co';
-const supabaseKey = 'sb_publishable_CxlR8ynzGWtNq11f_XwUww_j-yQ-IEV';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+// Supabase Integration - Prevent duplicate declaration
+let supabase;
+if (typeof window.supabase !== 'undefined') {
+    const supabaseUrl = 'https://oaiaawwiwawmrsukobmc.supabase.co';
+    const supabaseKey = 'sb_publishable_CxlR8ynzGWtNq11f_XwUww_j-yQ-IEV';
+    
+    if (!window.supabaseClient) {
+        window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    }
+    supabase = window.supabaseClient;
+} else {
+    console.error('Supabase library not loaded');
+}
 
 // File storage (now using Supabase)
 let uploadedFiles = [];
