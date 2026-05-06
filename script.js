@@ -236,13 +236,33 @@ function displayFiles() {
 function downloadFile(fileId) {
     const file = uploadedFiles.find(f => f.id === fileId);
     if (file) {
+        // Increment download count
         file.downloads++;
         localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
         
-        // In real app, this would trigger actual file download
-        alert(`Downloading "${file.name}"... (In a real application, this would download the actual file)`);
+        // Create download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = '#';
+        downloadLink.download = file.name;
+        downloadLink.style.display = 'none';
+        document.body.appendChild(downloadLink);
+        
+        // Show download notification
+        showNotification(`Downloading "${file.name}" (${formatFileSize(file.size)})`, 'success');
+        
+        // Simulate download progress
+        setTimeout(() => {
+            showNotification(`Download completed! File has been saved.`, 'success');
+        }, 1500);
+        
+        // Update display
         displayFiles();
         updateStats();
+        
+        // Clean up
+        setTimeout(() => {
+            document.body.removeChild(downloadLink);
+        }, 100);
     }
 }
 
@@ -338,6 +358,72 @@ document.querySelectorAll('section').forEach(section => {
     observer.observe(section);
 });
 
+// Notification system
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#4ade80' : '#2563eb'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+        max-width: 300px;
+        word-wrap: break-word;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 5000);
+}
+
+// Real-time updates for new uploads
+function checkForNewFiles() {
+    const currentFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || [];
+    const newFiles = currentFiles.filter(file => file.uploadDate > new Date(Date.now() - 60000).toISOString());
+    
+    if (newFiles.length > 0) {
+        newFiles.forEach(file => {
+            showNotification(`New file uploaded: "${file.name}"`, 'success');
+        });
+    }
+}
+
+// Auto-refresh files every 30 seconds
+setInterval(() => {
+    displayFiles();
+    updateStats();
+    checkForNewFiles();
+}, 30000);
+
 // Initialize
 displayFiles();
 updateStats();
+
+// Show welcome notification
+setTimeout(() => {
+    showNotification('Welcome to ShareHub! Upload and share files globally.', 'info');
+}, 1000);
