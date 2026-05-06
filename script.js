@@ -1,4 +1,9 @@
-// File storage (ready for Supabase integration)
+// Supabase Integration
+const supabaseUrl = 'https://oaiaawwiwawmrsukobmc.supabase.co';
+const supabaseKey = 'sb_publishable_CxlR8ynzGWtNq11f_XwUww_j-yQ-IEV';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// File storage (now using Supabase)
 let uploadedFiles = [];
 let currentFileId = null;
 
@@ -170,6 +175,29 @@ function getFileIcon(category) {
     return icons[category] || icons.other;
 }
 
+// Load files from Supabase
+async function loadFilesFromSupabase() {
+    try {
+        const { data, error } = await supabase
+            .from('files')
+            .select('*')
+            .order('upload_date', { ascending: false });
+        
+        if (error) {
+            console.error('Error loading files:', error);
+            showNotification('Error loading files. Please try again.', 'error');
+            return;
+        }
+        
+        uploadedFiles = data || [];
+        displayFiles();
+        updateStats();
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Connection error. Please check your internet.', 'error');
+    }
+}
+
 // Display files
 function displayFiles() {
     const filesGrid = document.getElementById('filesGrid');
@@ -188,9 +216,9 @@ function displayFiles() {
     filteredFiles.sort((a, b) => {
         switch (sortBy) {
             case 'newest':
-                return new Date(b.uploadDate) - new Date(a.uploadDate);
+                return new Date(b.upload_date) - new Date(a.upload_date);
             case 'oldest':
-                return new Date(a.uploadDate) - new Date(b.uploadDate);
+                return new Date(a.upload_date) - new Date(b.upload_date);
             case 'name':
                 return a.name.localeCompare(b.name);
             case 'size':
@@ -457,11 +485,29 @@ setInterval(() => {
     checkForNewFiles();
 }, 30000);
 
-// Initialize
-displayFiles();
-updateStats();
+// Initialize with Supabase
+document.addEventListener('DOMContentLoaded', () => {
+    loadFilesFromSupabase();
+    
+    // Show welcome notification
+    setTimeout(() => {
+        showNotification('Welcome to ShareHub! Upload and share files globally.', 'info');
+    }, 1000);
+});
 
-// Show welcome notification
-setTimeout(() => {
-    showNotification('Welcome to ShareHub! Upload and share files globally.', 'info');
-}, 1000);
+// Real-time updates for new files
+supabase
+    .channel('files')
+    .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'files' },
+        (payload) => {
+            console.log('Change received!', payload);
+            loadFilesFromSupabase(); // Reload files when changes happen
+            
+            // Show notification for new uploads
+            if (payload.eventType === 'INSERT') {
+                showNotification(`New file uploaded: "${payload.new.name}"`, 'success');
+            }
+        }
+    )
+    .subscribe();
