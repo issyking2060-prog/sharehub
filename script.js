@@ -60,8 +60,25 @@ const browseBtn = document.getElementById('browseBtn');
 const uploadProgress = document.getElementById('uploadProgress');
 const progressFill = document.getElementById('progressFill');
 const progressText = document.getElementById('progressText');
+const visibilityToggle = document.getElementById('visibilityToggle');
+const visibilityStatus = document.getElementById('visibilityStatus');
+const visibilityDescription = document.getElementById('visibilityDescription');
 
 browseBtn.addEventListener('click', () => fileInput.click());
+
+// Visibility toggle functionality
+visibilityToggle.addEventListener('change', () => {
+    const isPublic = visibilityToggle.checked;
+    if (isPublic) {
+        visibilityStatus.textContent = '🌍 Public';
+        visibilityStatus.style.color = '#4ade80';
+        visibilityDescription.textContent = 'Everyone can see and download this file';
+    } else {
+        visibilityStatus.textContent = '🔒 Private';
+        visibilityStatus.style.color = '#f59e0b';
+        visibilityDescription.textContent = 'Only you can see and download this file';
+    }
+});
 
 uploadArea.addEventListener('click', () => fileInput.click());
 
@@ -95,7 +112,7 @@ function handleFiles(files) {
     });
 }
 
-function uploadFile(file) {
+async function uploadFile(file) {
     uploadArea.style.display = 'none';
     uploadProgress.style.display = 'block';
 
@@ -111,36 +128,32 @@ function uploadFile(file) {
         if (progress >= 100) {
             clearInterval(interval);
             
-            // Create file object
-            const fileObj = {
-                id: Date.now(),
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                category: getFileCategory(file.type, file.name),
-                uploadDate: new Date().toISOString(),
-                downloads: 0,
-                description: `Uploaded ${new Date().toLocaleDateString()}`
-            };
-            
-            // Store file (in real app, upload to server)
-            uploadedFiles.push(fileObj);
-            localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
-            
-            // Reset UI
-            setTimeout(() => {
-                uploadArea.style.display = 'block';
-                uploadProgress.style.display = 'none';
-                progressFill.style.width = '0%';
-                progressText.textContent = '0%';
-                fileInput.value = '';
-                
-                // Refresh files display
-                displayFiles();
-                updateStats();
-                
-                alert(`File "${file.name}" uploaded successfully!`);
-            }, 1000);
+            // Upload to Supabase
+            uploadFileToSupabase(file).then(uploadedFile => {
+                if (uploadedFile) {
+                    // Reset UI
+                    setTimeout(() => {
+                        uploadArea.style.display = 'block';
+                        uploadProgress.style.display = 'none';
+                        progressFill.style.width = '0%';
+                        progressText.textContent = '0%';
+                        fileInput.value = '';
+                        
+                        // Refresh files display
+                        loadFilesFromSupabase();
+                        
+                        const visibility = uploadedFile.visibility === 'public' ? 'Public' : 'Private';
+                        showNotification(`File "${file.name}" uploaded successfully as ${visibility}!`, 'success');
+                    }, 1000);
+                } else {
+                    // Reset UI on error
+                    uploadArea.style.display = 'block';
+                    uploadProgress.style.display = 'none';
+                    progressFill.style.width = '0%';
+                    progressText.textContent = '0%';
+                    fileInput.value = '';
+                }
+            });
         }
     }, 200);
 }
@@ -198,18 +211,55 @@ async function loadFilesFromSupabase() {
     }
 }
 
+// Upload file to Supabase
+async function uploadFileToSupabase(file) {
+    try {
+        const visibility = visibilityToggle.checked ? 'public' : 'private';
+        
+        const { data, error } = await supabase
+            .from('files')
+            .insert([
+                {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    category: getFileCategory(file.type, file.name),
+                    visibility: visibility,
+                    upload_date: new Date().toISOString(),
+                    downloads: 0,
+                    description: `Uploaded ${new Date().toLocaleDateString()} - ${visibility === 'public' ? 'Public' : 'Private'} file`
+                }
+            ])
+            .select();
+        
+        if (error) {
+            console.error('Error uploading file:', error);
+            showNotification('Error uploading file. Please try again.', 'error');
+            return null;
+        }
+        
+        return data[0];
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Upload failed. Please try again.', 'error');
+        return null;
+    }
+}
+
 // Display files
 function displayFiles() {
     const filesGrid = document.getElementById('filesGrid');
     const emptyState = document.getElementById('emptyState');
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const categoryFilter = document.getElementById('categoryFilter').value;
+    const visibilityFilter = document.getElementById('visibilityFilter').value;
     const sortBy = document.getElementById('sortBy').value;
     
     let filteredFiles = uploadedFiles.filter(file => {
         const matchesSearch = file.name.toLowerCase().includes(searchTerm);
         const matchesCategory = !categoryFilter || file.category === categoryFilter;
-        return matchesSearch && matchesCategory;
+        const matchesVisibility = !visibilityFilter || file.visibility === visibilityFilter;
+        return matchesSearch && matchesCategory && matchesVisibility;
     });
     
     // Sort files
@@ -241,6 +291,9 @@ function displayFiles() {
         <div class="file-card" data-id="${file.id}">
             <div class="file-header">
                 <div class="file-info">
+                    <div class="visibility-badge ${file.visibility}">
+                        ${file.visibility === 'public' ? '🌍 Public' : '🔒 Private'}
+                    </div>
                     <h3 title="${file.name}">${file.name}</h3>
                     <div class="file-meta">
                         ${formatFileSize(file.size)} • ${file.downloads} downloads
@@ -371,6 +424,7 @@ window.addEventListener('click', (e) => {
 // Filter and sort event listeners
 document.getElementById('searchInput').addEventListener('input', displayFiles);
 document.getElementById('categoryFilter').addEventListener('change', displayFiles);
+document.getElementById('visibilityFilter').addEventListener('change', displayFiles);
 document.getElementById('sortBy').addEventListener('change', displayFiles);
 
 // Footer links

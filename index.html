@@ -51,11 +51,26 @@
                 
                 <div class="upload-section">
                     <div class="upload-area" id="uploadArea">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <h3>Drop files here or click to browse</h3>
-                        <p>Maximum file size: 50MB | Supported: Images, Documents, Videos, Audio</p>
-                        <input type="file" id="fileInput" multiple accept="image/*,application/pdf,.doc,.docx,.txt,.mp4,.mp3,.zip,.rar">
-                        <button class="btn btn-primary" id="browseBtn">Choose Files</button>
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h3>Drag & Drop Files Here</h3>
+                        <p>or click to browse (Max 50MB)</p>
+                        <input type="file" id="fileInput" multiple accept="image/*,application/pdf,.doc,.docx,.txt,.zip,.rar,.7z,video/*,audio/*">
+                        <button class="btn-primary" id="browseBtn">Choose Files</button>
+                        <div class="visibility-toggle">
+                            <label class="toggle-label">
+                                <span class="toggle-text">File Visibility:</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="visibilityToggle" checked>
+                                    <span class="slider"></span>
+                                </div>
+                                <span class="visibility-status" id="visibilityStatus">🌍 Public</span>
+                            </label>
+                            <p class="visibility-description" id="visibilityDescription">
+                                Everyone can see and download this file
+                            </p>
+                        </div>
                     </div>
                     
                     <div class="upload-progress" id="uploadProgress" style="display: none;">
@@ -77,17 +92,23 @@
                         <input type="text" id="searchInput" placeholder="Search files...">
                         <select id="categoryFilter">
                             <option value="">All Categories</option>
-                            <option value="image">Images</option>
                             <option value="document">Documents</option>
+                            <option value="image">Images</option>
                             <option value="video">Videos</option>
                             <option value="audio">Audio</option>
                             <option value="archive">Archives</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <select id="visibilityFilter">
+                            <option value="">All Files</option>
+                            <option value="public">🌍 Public Only</option>
+                            <option value="private">🔒 Private Only</option>
                         </select>
                         <select id="sortBy">
                             <option value="newest">Newest First</option>
                             <option value="oldest">Oldest First</option>
-                            <option value="name">Name A-Z</option>
-                            <option value="size">Size</option>
+                            <option value="name">Name (A-Z)</option>
+                            <option value="size">Size (Largest)</option>
                         </select>
                     </div>
                 </div>

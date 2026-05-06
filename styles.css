@@ -109,13 +109,12 @@ body {
 }
 
 .upload-area {
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px dashed rgba(255, 255, 255, 0.3);
-    border-radius: 15px;
-    padding: 60px 40px;
+    background: #f8f9fa;
+    border: 2px dashed #ddd;
+    border-radius: 12px;
+    padding: 60px 40px 40px;
     text-align: center;
     transition: all 0.3s ease;
-    cursor: pointer;
 }
 
 .upload-area:hover {
@@ -579,6 +578,107 @@ body {
 
 .notification-error {
     background: #ef4444;
+}
+
+/* Visibility Toggle */
+.visibility-toggle {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.toggle-text {
+    font-weight: 600;
+    color: #333;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background: #4ade80;
+}
+
+input:checked + .slider:before {
+    transform: translateX(30px);
+}
+
+.visibility-status {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #4ade80;
+}
+
+.visibility-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+    text-align: center;
+}
+
+/* Visibility Badges */
+.visibility-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.visibility-badge.public {
+    background: #4ade80;
+    color: white;
+}
+
+.visibility-badge.private {
+    background: #f59e0b;
+    color: white;
 }
 
 .footer-links {
