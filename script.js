@@ -1,15 +1,23 @@
-// Supabase Integration - Prevent duplicate declaration
+// Supabase Integration - Using ES6 Module approach
 let supabase;
-if (typeof window.supabase !== 'undefined') {
-    const supabaseUrl = 'https://oaiaawwiwawmrsukobmc.supabase.co';
-    const supabaseKey = 'sb_publishable_CxlR8ynzGWtNq11f_XwUww_j-yQ-IEV';
-    
-    if (!window.supabaseClient) {
-        window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+// Wait for the module to load
+function initializeSupabase() {
+    if (window.supabaseClient) {
+        supabase = window.supabaseClient;
+        console.log('Supabase client initialized successfully');
+        return true;
+    } else {
+        console.error('Supabase client not available');
+        return false;
     }
-    supabase = window.supabaseClient;
+}
+
+// Initialize Supabase when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeSupabase);
 } else {
-    console.error('Supabase library not loaded');
+    initializeSupabase();
 }
 
 // File storage (now using Supabase)
