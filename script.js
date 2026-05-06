@@ -1,37 +1,20 @@
-// Supabase Integration - Back to CDN approach
-let supabase;
-
-// Wait for Supabase to load
-function initializeSupabase() {
-    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-        const supabaseUrl = 'https://oaiaawwiwawmrsukobmc.supabase.co';
-        const supabaseKey = 'sb_publishable_CxlR8ynzGWtNq11f_XwUww_j-yQ-IEV';
-        
-        if (!window.supabaseClient) {
-            window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-        }
-        supabase = window.supabaseClient;
-        console.log('Supabase client initialized successfully');
-        return true;
-    } else {
-        console.error('Supabase library not loaded');
-        return false;
-    }
-}
-
-// Initialize Supabase when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeSupabase);
-} else {
-    initializeSupabase();
-}
-
-// File storage (now using Supabase)
+// File Storage - Using localStorage (ready for Firebase integration)
 let uploadedFiles = [];
 let currentFileId = null;
 
-// Clear localStorage for fresh Supabase integration
-localStorage.removeItem('uploadedFiles');
+// Load files from localStorage
+function loadFilesFromStorage() {
+    const stored = localStorage.getItem('uploadedFiles');
+    if (stored) {
+        uploadedFiles = JSON.parse(stored);
+    }
+    displayFiles();
+}
+
+// Save files to localStorage
+function saveFilesToStorage() {
+    localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+}
 
 // Mobile menu toggle
 const mobileMenu = document.getElementById('mobile-menu');
@@ -227,40 +210,43 @@ async function uploadFile(file) {
         if (progress >= 100) {
             clearInterval(interval);
             
-            // Upload to Supabase
-            uploadFileToSupabase(file).then(uploadedFile => {
-                if (uploadedFile) {
-                    // Reset UI
-                    setTimeout(() => {
-                        uploadArea.style.display = 'block';
-                        uploadProgress.style.display = 'none';
-                        progressFill.style.width = '0%';
-                        progressText.textContent = '0%';
-                        fileInput.value = '';
-                        
-                        // Refresh files display
-                        loadFilesFromSupabase();
-                        
-                        // Clear description field
-                        fileDescription.value = '';
-                        charCount.textContent = '0';
-                        charCount.style.color = '#666';
-                        
-                        const visibility = uploadedFile.visibility === 'public' ? 'Public' : 'Private';
-                        showNotification(`File "${file.name}" uploaded successfully as ${visibility}!`, 'success');
-                    }, 1000);
-                } else {
-                    // Reset UI on error
-                    uploadArea.style.display = 'block';
+            // Simulate file upload and save to localStorage
+            setTimeout(() => {
+                const visibility = visibilityToggle.checked ? 'public' : 'private';
+                const description = fileDescription.value.trim() || 
+                    `Uploaded ${new Date().toLocaleDateString()} - ${visibility === 'public' ? 'Public' : 'Private'} file`;
+                
+                const newFile = {
+                    id: Date.now().toString(),
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    category: getFileCategory(file.type),
+                    visibility: visibility,
+                    description: description,
+                    upload_date: new Date().toISOString(),
+                    downloads: 0
+                };
+                
+                uploadedFiles.unshift(newFile);
+                saveFilesToStorage();
+                displayFiles();
+                
+                // Reset UI
+                setTimeout(() => {
                     uploadProgress.style.display = 'none';
+                    uploadArea.style.display = 'block';
                     progressFill.style.width = '0%';
                     progressText.textContent = '0%';
                     fileInput.value = '';
+                    
+                    // Clear description field
                     fileDescription.value = '';
                     charCount.textContent = '0';
-                    charCount.style.color = '#666';
-                }
-            });
+                    
+                    showNotification('File uploaded successfully!', 'success');
+                }, 1000);
+            }, 2000);
         }
     }, 200);
 }
@@ -295,65 +281,7 @@ function getFileIcon(category) {
     return icons[category] || icons.other;
 }
 
-// Load files from Supabase
-async function loadFilesFromSupabase() {
-    try {
-        const { data, error } = await supabase
-            .from('files')
-            .select('*')
-            .order('upload_date', { ascending: false });
-        
-        if (error) {
-            console.error('Error loading files:', error);
-            showNotification('Error loading files. Please try again.', 'error');
-            return;
-        }
-        
-        uploadedFiles = data || [];
-        displayFiles();
-        updateStats();
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification('Connection error. Please check your internet.', 'error');
-    }
-}
 
-// Upload file to Supabase
-async function uploadFileToSupabase(file) {
-    try {
-        const visibility = visibilityToggle.checked ? 'public' : 'private';
-        const description = fileDescription.value.trim() || 
-            `Uploaded ${new Date().toLocaleDateString()} - ${visibility === 'public' ? 'Public' : 'Private'} file`;
-        
-        const { data, error } = await supabase
-            .from('files')
-            .insert([
-                {
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    category: getFileCategory(file.type, file.name),
-                    visibility: visibility,
-                    upload_date: new Date().toISOString(),
-                    downloads: 0,
-                    description: description
-                }
-            ])
-            .select();
-        
-        if (error) {
-            console.error('Error uploading file:', error);
-            showNotification('Error uploading file. Please try again.', 'error');
-            return null;
-        }
-        
-        return data[0];
-    } catch (error) {
-        console.error('Error:', error);
-        showNotification('Upload failed. Please try again.', 'error');
-        return null;
-    }
-}
 
 // Display files
 function displayFiles() {
@@ -595,7 +523,7 @@ const legalContent = {
                 <p>We use minimal cookies for essential functionality only.</p>
                 
                 <h3>5. Third-Party Services</h3>
-                <p>We use Supabase for database services and Vercel for hosting.</p>
+                <p>We use Firebase for database services and Vercel for hosting.</p>
                 
                 <h3>6. Your Rights</h3>
                 <ul>
@@ -870,29 +798,12 @@ setInterval(() => {
     checkForNewFiles();
 }, 30000);
 
-// Initialize with Supabase
+// Initialize with localStorage
 document.addEventListener('DOMContentLoaded', () => {
-    loadFilesFromSupabase();
+    loadFilesFromStorage();
     
     // Show welcome notification
     setTimeout(() => {
         showNotification('Welcome to ShareHub! Upload and share files globally.', 'info');
     }, 1000);
 });
-
-// Real-time updates for new files
-supabase
-    .channel('files')
-    .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'files' },
-        (payload) => {
-            console.log('Change received!', payload);
-            loadFilesFromSupabase(); // Reload files when changes happen
-            
-            // Show notification for new uploads
-            if (payload.eventType === 'INSERT') {
-                showNotification(`New file uploaded: "${payload.new.name}"`, 'success');
-            }
-        }
-    )
-    .subscribe();
