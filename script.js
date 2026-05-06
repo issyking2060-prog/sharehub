@@ -4,18 +4,27 @@ let currentFileId = null;
 
 // Load files from Firebase Firestore
 async function loadFilesFromStorage() {
+    console.log('Firebase DB available:', !!window.firebaseDB);
+    
     if (!window.firebaseDB) {
         console.error('Firebase not initialized');
+        showNotification('Firebase not loaded. Please refresh page.', 'error');
         return;
     }
     
     try {
+        console.log('Loading files from Firebase...');
         const q = query(collection(window.firebaseDB, 'files'), orderBy('upload_date', 'desc'));
         const querySnapshot = await getDocs(q);
+        console.log('Firebase query snapshot:', querySnapshot);
+        
         uploadedFiles = [];
         querySnapshot.forEach((doc) => {
+            console.log('Loading file:', doc.id, doc.data());
             uploadedFiles.push({ id: doc.id, ...doc.data() });
         });
+        
+        console.log('Total files loaded:', uploadedFiles.length);
         displayFiles();
     } catch (error) {
         console.error('Error loading files from Firebase:', error);
@@ -839,10 +848,23 @@ setInterval(() => {
 
 // Initialize with Firebase
 document.addEventListener('DOMContentLoaded', async () => {
-    await loadFilesFromStorage();
-    
-    // Show welcome notification
-    setTimeout(() => {
-        showNotification('Welcome to ShareHub! Upload and share files globally.', 'info');
-    }, 1000);
+    // Wait a moment for Firebase to initialize
+    if (!window.firebaseDB) {
+        console.log('Waiting for Firebase to initialize...');
+        setTimeout(async () => {
+            await loadFilesFromStorage();
+            
+            // Show welcome notification
+            setTimeout(() => {
+                showNotification('Welcome to ShareHub! Upload and share files globally with Firebase.', 'info');
+            }, 1000);
+        }, 1000);
+    } else {
+        await loadFilesFromStorage();
+        
+        // Show welcome notification
+        setTimeout(() => {
+            showNotification('Welcome to ShareHub! Upload and share files globally with Firebase.', 'info');
+        }, 1000);
+    }
 });
